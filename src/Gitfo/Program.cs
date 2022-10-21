@@ -8,6 +8,7 @@ string path;
 
 List<Repo> repos;
 
+Console.ForegroundColor = ConsoleColor.White;
 Console.BackgroundColor = ConsoleColor.Black;
 
 //update to add -f --fetch as a command line param
@@ -23,6 +24,11 @@ Console.WriteLine("|");
 Options o = Parser.Default.ParseArguments<Options>(args).Value;
 
 LoadRepos(path);
+
+if(string.IsNullOrWhiteSpace(o.CheckoutBranch) == false)
+{
+    Checkout(repos, o.CheckoutBranch);
+}
 
 if(o.Fetch)
 {
@@ -48,13 +54,15 @@ void LoadRepos(string path)
     }
 }
 
-void Pull(List<Repo> repos)
+void Checkout(List<Repo> repos, string branch)
 {
+    Console.WriteLine($"| Attempting to checkout {branch} for all repos");
+
     foreach (var repo in repos)
     {
-        Console.Write($"| Pull ");
+        Console.Write($"| Checkout ");
 
-        if (repo.Pull())
+        if (repo.Checkout(branch))
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("succeeded");

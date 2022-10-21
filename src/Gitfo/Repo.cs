@@ -27,14 +27,20 @@ namespace Gitfo
             Folder = folder;
             Name = Path.GetFileName(folder);
 
+            Initialize();
+        }
+
+        void Initialize()
+        { 
             try
             {
-                using var repo = new Repository(folder);
+                using var repo = new Repository(Folder);
 
                 IsGitRepo = true;
 
                 Branch = repo.Head.FriendlyName;
-                HasRemote = true;
+
+                HasRemote = repo.Head.IsTracking;
 
                 Ahead = repo.Head.TrackingDetails.AheadBy;
                 Behind = repo.Head.TrackingDetails.BehindBy;
@@ -42,11 +48,31 @@ namespace Gitfo
             }
             catch
             {
-
             }
         }
 
-        public bool Pull()
+        public bool Checkout(string branch)
+        {
+            using var repo = new Repository(Folder);
+
+            Branch newBranch;
+
+            try
+            {
+                newBranch = Commands.Checkout(repo, branch);
+                Initialize();
+            }
+            catch (Exception ex)
+            {
+                Console.Write($"{ex.Message} ");
+                return false;
+            }
+
+            return newBranch != null;
+        }
+
+        //not working
+        bool Pull()
         {
 
 

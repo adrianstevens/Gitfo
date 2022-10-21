@@ -2,8 +2,8 @@
 {
     internal static class Secrets
     {
-        public static string UserName => "adrianstevens";
+        public static string UserName => "";
 
-        public static string Email => "adrian.stevens@gmail.com";
+        public static string Email => "";
     }
 }
