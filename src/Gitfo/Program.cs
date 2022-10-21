@@ -1,41 +1,26 @@
-﻿// See https://aka.ms/new-console-template for more information
-using CommandLine;
+﻿using CommandLine;
 using Gitfo;
 using LibGit2Sharp;
 
-Console.BackgroundColor = ConsoleColor.Black;
-
 const int NameWidth = 30;
-
-Console.WriteLine("| Hello Gitfo");
 
 string path;
 
 int folderCount = 0;
 
-Parser.Default.ParseArguments<Options>(args)
-                  .WithParsed<Options>(o =>
-                  {
-                      if (o.Fetch)
-                      {
-     
-                      }
-                  });
+Console.BackgroundColor = ConsoleColor.Black;
+
+Console.WriteLine("| Hello Gitfo v0.1.0");
+Console.WriteLine("|");
+
+Options o = Parser.Default.ParseArguments<Options>(args).Value;
 
 //update to add -f --fetch as a command line param
 //update to add -C --directory as a param
 //update to add -c --checkout 
 //update to add -p --pull
-//update ot add -v --verion
-if (args.Length > 0)
-{
-    //assume the arg is the path
-    path = args[0];
-}
-else
-{
-    path = "C:\\WL";//  Directory.GetCurrentDirectory();
-}
+//update ot add -v --version
+path = Environment.CurrentDirectory;
 
 var folders = Directory.GetDirectories(path);
 
@@ -52,9 +37,12 @@ foreach (var folder in folders)
             {
                 try
                 {
-                    FetchOptions options = new FetchOptions();
-                    IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                    Commands.Fetch(repo, remote.Name, refSpecs, options, "");
+                    if(o.Fetch)
+                    {
+                        FetchOptions options = new FetchOptions();
+                        IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                        Commands.Fetch(repo, remote.Name, refSpecs, options, "");
+                    }
                 }
                 catch
                 {
@@ -97,18 +85,18 @@ foreach (var folder in folders)
 
 if (folderCount == 0)
 {
-    Console.WriteLine("No git repos found");
+    Console.WriteLine("| No git repos found");
 }
 
 void ConsoleWriteWithColor(string text, ConsoleColor color)
 {
     if(text.Length > NameWidth)
     {
-        text = text.Substring(0, NameWidth - 3) + "...";
+        text = string.Concat(text.AsSpan(0, NameWidth - 3), "...");
     }
 
     Console.ForegroundColor = color;
     Console.Write(text);
-    Console.ForegroundColor = ConsoleColor.White;
+    Console.ForegroundColor = ConsoleColor.Gray;
     Console.Write(" | ");
 }
