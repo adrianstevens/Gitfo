@@ -1,5 +1,4 @@
-﻿using CommandLine.Text;
-using CommandLine;
+﻿using CommandLine;
 
 namespace Gitfo
 {
@@ -7,5 +6,8 @@ namespace Gitfo
     {
         [Option('f', "fetch", Required = false, HelpText = "Fetch all repos")]
         public bool Fetch { get; set; } = false;
+
+      //  [Option('p', "pull", Required = false, HelpText = "Pull all repos")]
+      //  public bool Pull { get; set; } = false;
     }
 }

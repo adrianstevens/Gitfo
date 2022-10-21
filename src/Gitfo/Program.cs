@@ -1,91 +1,128 @@
 ﻿using CommandLine;
 using Gitfo;
-using LibGit2Sharp;
 
 const int NameWidth = 30;
+const int PropertyWidth = 6;
 
 string path;
 
-int folderCount = 0;
+List<Repo> repos;
 
 Console.BackgroundColor = ConsoleColor.Black;
-
-Console.WriteLine("| Hello Gitfo v0.1.0");
-Console.WriteLine("|");
-
-Options o = Parser.Default.ParseArguments<Options>(args).Value;
 
 //update to add -f --fetch as a command line param
 //update to add -C --directory as a param
 //update to add -c --checkout 
 //update to add -p --pull
 //update ot add -v --version
-path = Environment.CurrentDirectory;
+path = "C:\\WL"; // Environment.CurrentDirectory;
 
-var folders = Directory.GetDirectories(path);
+Console.WriteLine("| Hello Gitfo v0.1.1");
+Console.WriteLine("|");
 
-Console.WriteLine("| Repo name                      | Current branch                 | Ahead  | Behind | Dirty |");
-Console.WriteLine("|--------------------------------|--------------------------------|--------|--------|-------|");
+Options o = Parser.Default.ParseArguments<Options>(args).Value;
 
-foreach (var folder in folders)
+LoadRepos(path);
+
+if(o.Fetch)
 {
-    try
+    Fetch(repos);
+}
+
+ShowGitfoTable(repos);
+
+void LoadRepos(string path)
+{
+    repos = new List<Repo>();
+
+    var folders = Directory.GetDirectories(path);
+
+    foreach(var folder in folders)
     {
-        using (var repo = new Repository(folder))
+        var repo = new Repo(folder);
+
+        if (repo.IsGitRepo == true)
         {
-            foreach (Remote remote in repo.Network.Remotes)
-            {
-                try
-                {
-                    if(o.Fetch)
-                    {
-                        FetchOptions options = new FetchOptions();
-                        IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                        Commands.Fetch(repo, remote.Name, refSpecs, options, "");
-                    }
-                }
-                catch
-                {
-
-                }
-            }
-
-          //  int delta = repo.Head.TrackedBranch.Commits.Count() - repo.Head.Commits.Count();
-
-            var name = Path.GetFileName(folder).PadRight(NameWidth);
-            var friendly = repo.Head.FriendlyName.PadRight(NameWidth);
-            var ahead = $"{repo.Head.TrackingDetails.AheadBy}".PadRight(6);
-            var behind = $"{repo.Head.TrackingDetails.BehindBy}".PadRight(6);
-            var dirty = $"{repo.RetrieveStatus().IsDirty}".PadRight(5);
-
-            //  Console.WriteLine($"| {name} | {friendly} | {ahead} | {behind} | {dirty} |");
-
-            Console.Write("| ");
-            ConsoleWriteWithColor(name, ConsoleColor.White);
-
-            ConsoleWriteWithColor(friendly, ahead[0] == ' ' ? ConsoleColor.Yellow:ConsoleColor.White);
-            ConsoleWriteWithColor(ahead, ahead[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
-            ConsoleWriteWithColor(behind, behind[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
-            ConsoleWriteWithColor(dirty, repo.RetrieveStatus().IsDirty?ConsoleColor.Red:ConsoleColor.White);
-            Console.WriteLine();
-
-            folderCount++;
+            repos.Add(repo);
         }
-    }
-    catch(RepositoryNotFoundException ex)
-    {
-
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Exception: {folder} - {ex.Message}");
     }
 }
 
-
-if (folderCount == 0)
+void Pull(List<Repo> repos)
 {
-    Console.WriteLine("| No git repos found");
+    foreach (var repo in repos)
+    {
+        Console.Write($"| Pull ");
+
+        if (repo.Pull())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("succeeded");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("failed");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        Console.WriteLine($" for {repo.Name}");
+    }
+    Console.WriteLine("|");
+}
+
+void Fetch(List<Repo> repos)
+{
+    foreach(var repo in repos)
+    {
+        Console.Write($"| Fetch ");
+
+        if (repo.Fetch())
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("succeeded");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("failed");
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        Console.WriteLine($" for {repo.Name}");
+    }
+    Console.WriteLine("|");
+}
+
+void ShowGitfoTable(List<Repo> repos)
+{
+    Console.WriteLine($"| {"Repo name".PadRight(NameWidth)} | {"Current branch".PadRight(NameWidth)} | {"Ahead".PadRight(PropertyWidth)} | {"Behind".PadRight(PropertyWidth)} | {"Dirty".PadRight(PropertyWidth)} |");
+    Console.WriteLine($"| {"".PadRight(NameWidth, '-')} | {"".PadRight(NameWidth, '-')} | {"".PadRight(PropertyWidth, '-')} | {"".PadRight(PropertyWidth, '-')} | {"".PadRight(PropertyWidth, '-')} |");
+
+    foreach(var repo in repos)
+    {
+        var name = repo.Name.PadRight(NameWidth);
+        var friendly = repo.Branch.PadRight(NameWidth);
+        var ahead = $"{repo.Ahead}".PadRight(PropertyWidth);
+        var behind = $"{repo.Behind}".PadRight(PropertyWidth);
+        var dirty = $"{repo.IsDirty}".PadRight(PropertyWidth);
+
+        Console.Write("| ");
+        ConsoleWriteWithColor(name, ConsoleColor.White);
+
+        ConsoleWriteWithColor(friendly, ahead[0] == ' ' ? ConsoleColor.Yellow : ConsoleColor.White);
+        ConsoleWriteWithColor(ahead, ahead[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
+        ConsoleWriteWithColor(behind, behind[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
+        ConsoleWriteWithColor(dirty, repo.IsDirty ? ConsoleColor.Red : ConsoleColor.White);
+        Console.WriteLine();
+    }
+
+    if(repos.Count == 0)
+    {
+        Console.WriteLine("| No git repos found");
+    }
 }
 
 void ConsoleWriteWithColor(string text, ConsoleColor color)
