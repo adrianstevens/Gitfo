@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 	<PackAsTool>true</PackAsTool>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,7 +11,7 @@
 	<Authors>Adrian Stevens, Jorge Ramirez</Authors>
 	<Company>RadishTools</Company>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageVersion>0.1.1</PackageVersion>
+	<PackageVersion>0.2.0</PackageVersion>
     <PackageProjectUrl>https://github.com/adrianstevens/Gitfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/adrianstevens/Gitfo</RepositoryUrl>
     <PackageTags>Gitfo,git</PackageTags>
@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+    <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
   </ItemGroup>
 
 </Project>

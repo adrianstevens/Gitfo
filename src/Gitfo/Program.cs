@@ -16,9 +16,9 @@ Console.BackgroundColor = ConsoleColor.Black;
 //update to add -c --checkout 
 //update to add -p --pull
 //update ot add -v --version
-path = "C:\\WL"; // Environment.CurrentDirectory;
+path = Environment.CurrentDirectory;
 
-Console.WriteLine("| Hello Gitfo v0.1.1");
+Console.WriteLine("| Gitfo v0.2.0");
 Console.WriteLine("|");
 
 Options o = Parser.Default.ParseArguments<Options>(args).Value;
