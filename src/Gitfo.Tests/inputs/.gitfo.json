@@ -1,0 +1,201 @@
+﻿{
+  "profiles": {
+    "wl": {
+      "repos": [
+        {
+          "owner": "WildernessLabs",
+          "repo": "Clima",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Cultivar",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Juego",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Contracts",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Core",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Foundation",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Foundation.CompositeDevices",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Foundation.FeatherWings",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Foundation.Grove",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Foundation.mikroBUS",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Logging",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.MBus",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Modbus",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.ProjectLab",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Samples",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.TensorFlow",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.TestSuite",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Units",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "Meadow.Workbench",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "MQTTnet",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "VSCode_Meadow_Extension",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        },
+        {
+          "owner": "WildernessLabs",
+          "repo": "VS_Win_Meadow_Extension",
+          "defaultBranch": "develop",
+          "pat": null,
+          "folder": "wilderness"
+        }
+      ]
+    },
+    "dotnetMakers": {
+      "repos": [
+        {
+          "owner": "dotnetMakers",
+          "repo": "CSharpAndSensors",
+          "defaultBranch": "main",
+          "pat": null,
+          "folder": "dotnetMakers"
+        },
+        {
+          "owner": "dotnetMakers",
+          "repo": "Gitfo",
+          "defaultBranch": "main",
+          "pat": null,
+          "folder": "dotnetMakers"
+        },
+        {
+          "owner": "dotnetMakers",
+          "repo": "YoshiBot",
+          "defaultBranch": "main",
+          "pat": null,
+          "folder": "dotnetMakers"
+        },
+        {
+          "owner": "dotnetMakers",
+          "repo": "YoshiStat",
+          "defaultBranch": "main",
+          "pat": null,
+          "folder": "dotnetMakers"
+        }
+      ]
+    }
+  }
+}
