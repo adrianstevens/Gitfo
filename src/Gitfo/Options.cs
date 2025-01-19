@@ -1,16 +1,43 @@
 ﻿using CommandLine;
 
-namespace Gitfo
+namespace Gitfo;
+
+internal class BaseOptions
 {
-    internal class Options
-    {
-        [Option('f', "fetch", Required = false, HelpText = "Fetch all repos")]
-        public bool Fetch { get; set; } = false;
+    [Option('p', "profile", Required = false, HelpText = "Profile to use")]
+    public string? ProfileName { get; set; }
+}
 
-        [Option('c', "checkout", Required = false, HelpText = "Attempt to checkout branch on all repos")]
-        public string CheckoutBranch { get; set; }
+[Verb("status", HelpText = "Get the current status of all repositories")]
+internal class StatusOptions : BaseOptions
+{
+}
 
-        //  [Option('p', "pull", Required = false, HelpText = "Pull all repos")]
-        //  public bool Pull { get; set; } = false;
-    }
+[Verb("sync", HelpText = "Synchronize repositories according to configuration")]
+internal class SyncOptions : BaseOptions
+{
+}
+
+[Verb("fetch", HelpText = "Fetch latest changes without merging")]
+public class FetchOptions : BaseOptions
+{
+    [Option('a', "all", Required = false, HelpText = "Fetch all remotes")]
+    public bool FetchAll { get; set; }
+}
+
+[Verb("pull", HelpText = "Pull latest changes for repositories")]
+internal class PullOptions : BaseOptions
+{
+}
+
+[Verb("checkout", HelpText = "Checkout specific branch for repositories")]
+internal class CheckoutOptions : BaseOptions
+{
+    [Option('b', "branch", Required = false, HelpText = "Branch name to checkout")]
+    public string? BranchName { get; set; }
+}
+
+[Verb("generate", HelpText = "Generate a .gitfo configuration file from an existing folder structure")]
+internal class GenerateOptions : BaseOptions
+{
 }
