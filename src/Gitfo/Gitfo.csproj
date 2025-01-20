@@ -11,7 +11,7 @@
 	<Authors>Adrian Stevens, Jorge Ramirez, Chris Tacke</Authors>
 	<Company>RadishTools</Company>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageVersion>0.3.0</PackageVersion>
+	<PackageVersion>0.3.1</PackageVersion>
     <PackageProjectUrl>https://github.com/adrianstevens/Gitfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/adrianstevens/Gitfo</RepositoryUrl>
     <PackageTags>Gitfo,git</PackageTags>
@@ -23,6 +23,10 @@
 	<AssemblyName>gitfo</AssemblyName>
 	<LangVersion>latest</LangVersion>
 	<Copyright>Copyright 2022-2025</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
