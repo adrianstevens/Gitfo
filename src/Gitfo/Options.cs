@@ -16,6 +16,8 @@ internal class StatusOptions : BaseOptions
 [Verb("sync", HelpText = "Synchronize repositories according to configuration")]
 internal class SyncOptions : BaseOptions
 {
+    [Option('a', "all", Required = false, HelpText = "Sync all repositories in all profiles")]
+    public bool SyncAll { get; set; }
 }
 
 [Verb("fetch", HelpText = "Fetch latest changes without merging")]

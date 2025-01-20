@@ -7,6 +7,16 @@ internal class RepoOptions
     public string DefaultBranch { get; set; }
 }
 
+internal enum RepoStatus
+{
+    Good,
+    DirectoryMissing,
+    AuthenticationFailed,
+    Conflict,
+    MergeHeadNotFound,
+    NoRemote
+}
+
 internal class Repo
 {
     private readonly GitfoConfiguration.RepositoryInfo _repoInfo;
@@ -31,6 +41,8 @@ internal class Repo
 
     public RepoOptions Options { get; set; }
 
+    public RepoStatus Status { get; set; }
+
     public string Owner => _repoInfo.Owner;
     public string DefaultBranch => _repoInfo.DefaultBranch ?? "main";
 
@@ -51,6 +63,8 @@ internal class Repo
 
     private void Initialize()
     {
+        Status = RepoStatus.Good;
+
         try
         {
             if (!Directory.Exists(Folder))
@@ -70,8 +84,13 @@ internal class Repo
             Behind = repo.Head.TrackingDetails.BehindBy;
             IsDirty = repo.RetrieveStatus().IsDirty;
         }
-        catch
+        catch (RepositoryNotFoundException e)
         {
+            Status = RepoStatus.DirectoryMissing;
+        }
+        catch (Exception ex)
+        {
+            Status = RepoStatus.DirectoryMissing;
         }
     }
 
@@ -128,12 +147,34 @@ internal class Repo
         }
 
         // Pull changes
-        Commands.Pull(
-            repo,
-            // TODO: put this in the .gitfo file
-            new Signature("gitfo", "gitfo@local", DateTimeOffset.Now), // Signature for merge commit if needed
-            options
-        );
+        try
+        {
+            Commands.Pull(
+                repo,
+                // TODO: put this in the .gitfo file
+                new Signature("gitfo", "gitfo@local", DateTimeOffset.Now), // Signature for merge commit if needed
+                options
+            );
+        }
+        catch (CheckoutConflictException)
+        {
+            Status = RepoStatus.Conflict;
+            return false;
+        }
+        catch (MergeFetchHeadNotFoundException)
+        {
+            Status = RepoStatus.MergeHeadNotFound;
+            return false;
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("authentication"))
+            {
+                Status = RepoStatus.AuthenticationFailed;
+            }
+
+            return false;
+        }
 
         return true;
     }
@@ -182,15 +223,28 @@ internal class Repo
         }
 
         // Clone the repository
-        Repository.Clone(repoUrl, Folder, options);
+        try
+        {
+            Repository.Clone(repoUrl, Folder, options);
+        }
+        catch (LibGit2SharpException ex)
+        {
+            if (ex.Message.Contains("authentication"))
+            {
+                Status = RepoStatus.AuthenticationFailed;
+            }
+
+            return false;
+        }
 
         return true;
     }
 
     public bool Fetch()
     {
-        if (IsPrivate || HasRemote == false)
+        if (HasRemote == false)
         {
+            Status = RepoStatus.NoRemote;
             return false;
         }
 
@@ -204,8 +258,13 @@ internal class Repo
                 IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
                 Commands.Fetch(repo, remote.Name, refSpecs, options, "");
             }
-            catch
+            catch (Exception ex)
             {
+                if (ex.Message.Contains("authentication"))
+                {
+                    Status = RepoStatus.AuthenticationFailed;
+                }
+
                 return false;
             }
         }

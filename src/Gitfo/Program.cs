@@ -20,12 +20,14 @@ Console.WriteLine("| Gitfo v0.3.0");
 Console.WriteLine("|");
 
 string? profileName = null;
+bool profileSpecified = false;
 
 Parser.Default.ParseArguments<BaseOptions>(args)
     .MapResult(
                 (BaseOptions opts) =>
                 {
                     profileName = opts.ProfileName ?? "main";
+                    profileSpecified = true;
                     return 0;
                 },
                 _ => 1);
@@ -34,8 +36,9 @@ var loadResult = LoadOptions(rootPath);
 
 if (loadResult.result == 2)
 {
+    Console.Write("| ");
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.Write("Unable to load .gitfo config");
+    Console.WriteLine("Error: Unable to load .gitfo config");
     Console.ForegroundColor = ConsoleColor.White;
     return loadResult.result;
 }
@@ -44,8 +47,9 @@ var options = loadResult.options;
 
 if (options == null && !args.Contains("generate"))
 {
+    Console.Write("| ");
     Console.ForegroundColor = ConsoleColor.Red;
-    Console.Write("Unable to load .gitfo config");
+    Console.WriteLine("Error: Unable to load .gitfo config");
     Console.ForegroundColor = ConsoleColor.White;
     return 1;
 }
@@ -58,6 +62,15 @@ if (options != null)
     selectedProfile = options.Profiles.FirstOrDefault(p => p.Name == profileName);
     if (selectedProfile == null)
     {
+        if (profileSpecified)
+        {
+            Console.Write("| ");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Error: Profile '{profileName}' not found.");
+            Console.ForegroundColor = ConsoleColor.White;
+            return 2;
+        }
+
         selectedProfile = options.Profiles.FirstOrDefault(p => p.Name.Contains("default"));
         if (selectedProfile == null)
         {
@@ -80,6 +93,20 @@ var result = Parser.Default.ParseArguments<
                 (SyncOptions opts) =>
                 {
                     reload = true;
+
+                    if (opts.SyncAll)
+                    {
+                        int allReturn = 0;
+
+                        foreach (var profile in options.Profiles)
+                        {
+                            var profileRepos = LoadRepos(rootPath, profile);
+                            allReturn += Sync(profileRepos, opts);
+                        }
+
+                        return allReturn;
+                    }
+
                     return Sync(repos, opts);
                 },
                 (FetchOptions opts) => Fetch(repos, opts),
@@ -251,6 +278,11 @@ int Sync(IEnumerable<Repo> repos, SyncOptions options)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("failed");
+
+            if (repo.Status != RepoStatus.Good)
+            {
+                Console.Write($" ({repo.Status})");
+            }
             Console.ForegroundColor = ConsoleColor.White;
         }
 
@@ -332,18 +364,34 @@ void ShowGitfoTable(IEnumerable<Repo> repos)
     foreach (var repo in repos)
     {
         var name = repo.Name.PadRight(NameWidth);
-        var friendly = repo.CurentBranch.PadRight(NameWidth);
+
+        var friendly = repo.Status switch
+        {
+            RepoStatus.Good => repo.CurentBranch,
+            RepoStatus.DirectoryMissing => "[missing folder]",
+            RepoStatus.AuthenticationFailed => "[authentication failed]",
+            RepoStatus.NoRemote => "[no remote branch]",
+            _ => repo.Status.ToString()
+        };
+
+        friendly = friendly.PadRight(NameWidth);
         var ahead = $"{repo.Ahead}".PadRight(PropertyWidth);
         var behind = $"{repo.Behind}".PadRight(PropertyWidth);
         var dirty = $"{repo.IsDirty}".PadRight(PropertyWidth);
 
+        var friendlyColor = repo.Status switch
+        {
+            RepoStatus.Good => ahead[0] == ' ' ? ConsoleColor.Yellow : ConsoleColor.White,
+            _ => ConsoleColor.Red
+        };
+
         Console.Write("| ");
         ConsoleWriteWithColor(name, ConsoleColor.White);
 
-        ConsoleWriteWithColor(friendly, ahead[0] == ' ' ? ConsoleColor.Yellow : ConsoleColor.White);
+        ConsoleWriteWithColor(friendly, friendlyColor);
         ConsoleWriteWithColor(ahead, ahead[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
         ConsoleWriteWithColor(behind, behind[0] == '0' ? ConsoleColor.White : ConsoleColor.Cyan);
-        ConsoleWriteWithColor(dirty, repo.IsDirty ? ConsoleColor.Red : ConsoleColor.White);
+        ConsoleWriteWithColor(dirty, repo.IsDirty ? ConsoleColor.Magenta : ConsoleColor.White);
         Console.WriteLine();
     }
 
