@@ -51,7 +51,7 @@ if (options == null && !args.Contains("generate"))
 }
 
 IEnumerable<Repo>? repos = null;
-GitfoOptions.Profile? selectedProfile = null;
+GitfoConfiguration.Profile? selectedProfile = null;
 
 if (options != null)
 {
@@ -108,7 +108,7 @@ ShowGitfoTable(repos);
 
 return result;
 
-(int result, GitfoOptions? options) LoadOptions(string path)
+(int result, GitfoConfiguration? options) LoadOptions(string path)
 {
     var directory = new DirectoryInfo(path);
     if (!directory.Exists)
@@ -121,10 +121,10 @@ return result;
     }
 
     // look for a '.gitfo' file
-    var optionPath = Path.Combine(directory.FullName, GitfoOptions.OptionsFileName);
+    var optionPath = Path.Combine(directory.FullName, GitfoConfiguration.ConfigFileName);
     if (File.Exists(optionPath))
     {
-        if (GitfoOptions.TryParse(File.ReadAllText(optionPath), out GitfoOptions options))
+        if (GitfoConfiguration.TryParse(File.ReadAllText(optionPath), out GitfoConfiguration options))
         {
             return (0, options);
         }
@@ -133,7 +133,7 @@ return result;
     return (2, null);
 }
 
-IEnumerable<Repo> LoadRepos(string rootPath, GitfoOptions.Profile profile)
+IEnumerable<Repo> LoadRepos(string rootPath, GitfoConfiguration.Profile profile)
 {
     var repos = new List<Repo>();
 
@@ -149,9 +149,9 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoOptions.Profile profile)
     return repos;
 }
 
-(int result, GitfoOptions? options) Generate(string rootPath, GenerateOptions options)
+(int result, GitfoConfiguration? options) Generate(string rootPath, GenerateOptions options)
 {
-    var configPath = Path.Combine(rootPath, GitfoOptions.OptionsFileName);
+    var configPath = Path.Combine(rootPath, GitfoConfiguration.ConfigFileName);
     if (File.Exists(configPath))
     {
         Console.ForegroundColor = ConsoleColor.Red;
@@ -160,7 +160,7 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoOptions.Profile profile)
         return (2, null);
     }
 
-    var generatedRepos = new List<GitfoOptions.RepositoryInfo>();
+    var generatedRepos = new List<GitfoConfiguration.RepositoryInfo>();
 
     Console.ForegroundColor = ConsoleColor.White;
     Console.WriteLine("| Generating...");
@@ -188,7 +188,7 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoOptions.Profile profile)
                 Console.WriteLine($"|   adding   {Path.GetFileName(candidate)}");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                generatedRepos.Add(new GitfoOptions.RepositoryInfo
+                generatedRepos.Add(new GitfoConfiguration.RepositoryInfo
                 {
                     LocalFolder = Path.GetFileName(owner),
                     Owner = GitConfigParser.GetOwner(test),
@@ -199,7 +199,7 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoOptions.Profile profile)
         }
     }
 
-    var generatedOptions = new GitfoOptions();
+    var generatedOptions = new GitfoConfiguration();
     generatedOptions.Profiles.Add("default", generatedRepos);
     var opts = new JsonSerializerOptions(JsonSerializerDefaults.Web)
     {

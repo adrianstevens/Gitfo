@@ -5,11 +5,6 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitfo", "Gitfo\Gitfo.csproj", "{59694B7F-2C6A-4202-9453-9E42F2F22FE5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{C50B8048-D1EB-4A82-87AD-659F3472CC74}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\.gitfo = ..\..\..\.gitfo
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gitfo.Tests", "Gitfo.Tests\Gitfo.Tests.csproj", "{B0DC30F6-5DF1-44E0-BA30-8BAF2A55DB5B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D9736396-DF68-407A-91D2-BC12A31A573B}"

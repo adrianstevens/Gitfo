@@ -19,7 +19,7 @@ internal class SyncOptions : BaseOptions
 }
 
 [Verb("fetch", HelpText = "Fetch latest changes without merging")]
-public class FetchOptions : BaseOptions
+internal class FetchOptions : BaseOptions
 {
     [Option('a', "all", Required = false, HelpText = "Fetch all remotes")]
     public bool FetchAll { get; set; }

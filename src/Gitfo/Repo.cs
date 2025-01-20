@@ -9,7 +9,7 @@ internal class RepoOptions
 
 internal class Repo
 {
-    private readonly GitfoOptions.RepositoryInfo _repoInfo;
+    private readonly GitfoConfiguration.RepositoryInfo _repoInfo;
 
     public string Name { get; set; }
 
@@ -34,7 +34,7 @@ internal class Repo
     public string Owner => _repoInfo.Owner;
     public string DefaultBranch => _repoInfo.DefaultBranch ?? "main";
 
-    public Repo(string folder, GitfoOptions.RepositoryInfo repoInfo)
+    public Repo(string folder, GitfoConfiguration.RepositoryInfo repoInfo)
     {
         _repoInfo = repoInfo;
 
