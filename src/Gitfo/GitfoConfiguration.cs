@@ -4,11 +4,11 @@ using System.Text.Json.Serialization;
 
 namespace Gitfo;
 
-internal class GitfoOptions
+internal class GitfoConfiguration
 {
-    private static GitfoOptions _default = default!;
+    private static GitfoConfiguration _default = default!;
 
-    public const string OptionsFileName = ".gitfo";
+    public const string ConfigFileName = ".gitfo";
 
     [JsonPropertyName("profiles")]
     public ProfileCollection Profiles { get; set; } = new();
@@ -144,14 +144,14 @@ internal class GitfoOptions
         public string? LocalFolder { get; set; }
     }
 
-    public static GitfoOptions Default
+    public static GitfoConfiguration Default
     {
-        get => _default ??= new GitfoOptions
+        get => _default ??= new GitfoConfiguration
         {
         };
     }
 
-    internal static bool TryParse(string json, out GitfoOptions options)
+    internal static bool TryParse(string json, out GitfoConfiguration options)
     {
         try
         {
@@ -160,7 +160,7 @@ internal class GitfoOptions
                 PropertyNameCaseInsensitive = true
             };
 
-            var opts = JsonSerializer.Deserialize<GitfoOptions>(json, jsonOpts);
+            var opts = JsonSerializer.Deserialize<GitfoConfiguration>(json, jsonOpts);
             if (opts != null)
             {
                 options = opts;
