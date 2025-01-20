@@ -8,10 +8,10 @@
     <Nullable>enable</Nullable>
 	<ToolCommandName>gitfo</ToolCommandName>
 	<PackageId>RadishTools.Gitfo</PackageId>
-	<Authors>Adrian Stevens, Jorge Ramirez</Authors>
+	<Authors>Adrian Stevens, Jorge Ramirez, Chris Tacke</Authors>
 	<Company>RadishTools</Company>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageVersion>0.2.0</PackageVersion>
+	<PackageVersion>0.3.0</PackageVersion>
     <PackageProjectUrl>https://github.com/adrianstevens/Gitfo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/adrianstevens/Gitfo</RepositoryUrl>
     <PackageTags>Gitfo,git</PackageTags>
@@ -22,12 +22,12 @@
 	<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
 	<AssemblyName>gitfo</AssemblyName>
 	<LangVersion>latest</LangVersion>
-	<Copyright>Copyright 2022</Copyright>
+	<Copyright>Copyright 2022-2025</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="LibGit2Sharp" Version="0.30.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
   </ItemGroup>
 
 </Project>
