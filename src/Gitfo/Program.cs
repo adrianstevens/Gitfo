@@ -26,6 +26,14 @@ Parser.Default.ParseArguments<BaseOptions>(args)
     .MapResult(
                 (BaseOptions opts) =>
                 {
+                    if (opts.ScanLocal)
+                    {
+                        // Force scanning
+                        var scanned = FolderScanner.FindLocalRepos(rootPath);
+                        ShowGitfoTable(scanned);
+                        return 0;
+                    }
+
                     profileName = opts.ProfileName ?? "main";
                     profileSpecified = true;
                     return 0;
@@ -37,10 +45,22 @@ var loadResult = LoadOptions(rootPath);
 if (loadResult.result == 2)
 {
     Console.Write("| ");
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("Error: Unable to load .gitfo config");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("No .gitfo config found, scanning local folders for Git repos...");
     Console.ForegroundColor = ConsoleColor.White;
-    return loadResult.result;
+
+    var scannedRepos = FolderScanner.FindLocalRepos(rootPath).ToList();
+
+    if (!scannedRepos.Any())
+    {
+        Console.WriteLine("| No local Git repos found.");
+        return 0;
+    }
+    else
+    {
+        ShowGitfoTable(scannedRepos);
+        return 0;
+    }
 }
 
 var options = loadResult.options;

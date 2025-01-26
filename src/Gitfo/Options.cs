@@ -6,6 +6,9 @@ internal class BaseOptions
 {
     [Option('p', "profile", Required = false, HelpText = "Profile to use")]
     public string? ProfileName { get; set; }
+
+    [Option('l', "scan-local", HelpText = "Ignore .gitfo config and scan local folders")]
+    public bool ScanLocal { get; set; }
 }
 
 [Verb("status", HelpText = "Get the current status of all repositories")]
