@@ -4,7 +4,10 @@ namespace Gitfo;
 
 internal class RepoOptions
 {
-    public string DefaultBranch { get; set; }
+    /// <summary>
+    /// The default branch to use when cloning the repository
+    /// </summary>
+    public string? DefaultBranch { get; set; }
 }
 
 internal enum RepoStatus
@@ -55,10 +58,7 @@ internal class Repo
 
         Initialize();
 
-        if (CurentBranch == null)
-        {
-            CurentBranch = repoInfo.DefaultBranch ?? "[unknown]";
-        }
+        CurentBranch ??= repoInfo.DefaultBranch ?? "[unknown]";
     }
 
     private void Initialize()
@@ -84,11 +84,11 @@ internal class Repo
             Behind = repo.Head.TrackingDetails.BehindBy;
             IsDirty = repo.RetrieveStatus().IsDirty;
         }
-        catch (RepositoryNotFoundException e)
+        catch (RepositoryNotFoundException)
         {
             Status = RepoStatus.DirectoryMissing;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Status = RepoStatus.DirectoryMissing;
         }
