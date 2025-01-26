@@ -16,7 +16,7 @@ Console.BackgroundColor = ConsoleColor.Black;
 //update ot add -v --version
 var rootPath = Environment.CurrentDirectory;
 
-Console.WriteLine("| Gitfo v0.3.2");
+Console.WriteLine("| Gitfo v0.3.3");
 Console.WriteLine("|");
 
 string? profileName = null;
@@ -26,6 +26,14 @@ Parser.Default.ParseArguments<BaseOptions>(args)
     .MapResult(
                 (BaseOptions opts) =>
                 {
+                    if (opts.ScanLocal)
+                    {
+                        // Force scanning
+                        var scanned = FolderScanner.FindLocalRepos(rootPath);
+                        ShowGitfoTable(scanned);
+                        return 0;
+                    }
+
                     profileName = opts.ProfileName ?? "main";
                     profileSpecified = true;
                     return 0;
@@ -37,10 +45,22 @@ var loadResult = LoadOptions(rootPath);
 if (loadResult.result == 2)
 {
     Console.Write("| ");
-    Console.ForegroundColor = ConsoleColor.Red;
-    Console.WriteLine("Error: Unable to load .gitfo config");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("No .gitfo config found, scanning local folders for Git repos...");
     Console.ForegroundColor = ConsoleColor.White;
-    return loadResult.result;
+
+    var scannedRepos = FolderScanner.FindLocalRepos(rootPath).ToList();
+
+    if (!scannedRepos.Any())
+    {
+        Console.WriteLine("| No local Git repos found.");
+        return 0;
+    }
+    else
+    {
+        ShowGitfoTable(scannedRepos);
+        return 0;
+    }
 }
 
 var options = loadResult.options;
@@ -101,21 +121,21 @@ var result = Parser.Default.ParseArguments<
                         foreach (var profile in options.Profiles)
                         {
                             var profileRepos = LoadRepos(rootPath, profile);
-                            allReturn += Sync(profileRepos, opts);
+                            allReturn += GitOperations.Sync(profileRepos, opts);
                         }
 
                         return allReturn;
                     }
 
-                    return Sync(repos, opts);
+                    return GitOperations.Sync(repos, opts);
                 },
-                (FetchOptions opts) => Fetch(repos, opts),
-                (PullOptions opts) => Pull(repos, opts),
-                (CheckoutOptions opts) => Checkout(repos, opts),
+                (FetchOptions opts) => GitOperations.Fetch(repos, opts),
+                (PullOptions opts) => GitOperations.Pull(repos, opts),
+                (CheckoutOptions opts) => GitOperations.Checkout(repos, opts),
                 (GenerateOptions opts) =>
                 {
                     reload = true;
-                    var gen = Generate(rootPath, opts);
+                    var gen = GenerateGitfoConfiguration(rootPath, opts);
                     options = gen.options;
                     return gen.result;
                 },
@@ -176,7 +196,7 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoConfiguration.Profile profile)
     return repos;
 }
 
-(int result, GitfoConfiguration? options) Generate(string rootPath, GenerateOptions options)
+(int result, GitfoConfiguration? options) GenerateGitfoConfiguration(string rootPath, GenerateOptions options)
 {
     var configPath = Path.Combine(rootPath, GitfoConfiguration.ConfigFileName);
     if (File.Exists(configPath))
@@ -235,125 +255,6 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoConfiguration.Profile profile)
 
     File.WriteAllText(configPath, JsonSerializer.Serialize(generatedOptions, opts));
     return (0, generatedOptions);
-}
-
-int Pull(IEnumerable<Repo> repos, PullOptions options)
-{
-    foreach (var repo in repos)
-    {
-        Console.Write($"| Pull {repo.Name}...");
-
-        if (repo.Pull())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("succeeded");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("failed");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        Console.WriteLine();
-    }
-
-    return 0;
-}
-
-int Sync(IEnumerable<Repo> repos, SyncOptions options)
-{
-    foreach (var repo in repos)
-    {
-        Console.Write($"| Sync {repo.Name}...");
-
-        if (repo.Sync())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("succeeded");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("failed");
-
-            if (repo.Status != RepoStatus.Good)
-            {
-                Console.Write($" ({repo.Status})");
-            }
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        Console.WriteLine();
-    }
-
-    return 0;
-}
-
-int Checkout(IEnumerable<Repo> repos, CheckoutOptions options)
-{
-    Console.ForegroundColor = ConsoleColor.White;
-    Console.Write($"| Attempting to checkout ");
-    Console.ForegroundColor = ConsoleColor.Yellow;
-    Console.Write(options.BranchName ?? "[default]");
-    Console.ForegroundColor = ConsoleColor.White;
-    Console.WriteLine($" for all repos");
-
-    foreach (var repo in repos)
-    {
-        Console.Write($"| Checkout ");
-
-        var branch = options.BranchName ?? repo.DefaultBranch;
-
-        if (repo.Checkout(branch))
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("succeeded");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("failed");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        Console.Write($" for ");
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine(repo.Name);
-        Console.ForegroundColor = ConsoleColor.White;
-    }
-    Console.WriteLine("|");
-
-    return 0;
-}
-
-int Fetch(IEnumerable<Repo> repos, FetchOptions options)
-{
-    foreach (var repo in repos)
-    {
-        Console.Write($"| Fetch ");
-
-        if (repo.Fetch())
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("succeeded");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-        else
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("failed");
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-        Console.WriteLine($" for {repo.Name}");
-    }
-    Console.WriteLine("|");
-
-    return 0;
 }
 
 void ShowGitfoTable(IEnumerable<Repo> repos)
