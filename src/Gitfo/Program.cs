@@ -16,7 +16,7 @@ Console.BackgroundColor = ConsoleColor.Black;
 //update ot add -v --version
 var rootPath = Environment.CurrentDirectory;
 
-Console.WriteLine("| Gitfo v0.3.0");
+Console.WriteLine("| Gitfo v0.3.2");
 Console.WriteLine("|");
 
 string? profileName = null;
