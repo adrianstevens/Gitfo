@@ -10,15 +10,11 @@ internal static class GitOperations
 
             if (repo.Pull())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("succeeded");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("succeeded", ConsoleColor.Green);
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("failed");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("failed", ConsoleColor.Red);
             }
 
             Console.WriteLine();
@@ -35,9 +31,7 @@ internal static class GitOperations
 
             if (repo.Sync())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("succeeded");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("succeeded", ConsoleColor.Green);
             }
             else
             {
@@ -74,21 +68,15 @@ internal static class GitOperations
 
             if (repo.Checkout(branch))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("succeeded");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("succeeded", ConsoleColor.Green);
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("failed");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("failed", ConsoleColor.Red);
             }
 
             Console.Write($" for ");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(repo.Name);
-            Console.ForegroundColor = ConsoleColor.White;
+            PrintColored(repo.Name, ConsoleColor.Yellow);
         }
         Console.WriteLine("|");
 
@@ -103,15 +91,11 @@ internal static class GitOperations
 
             if (repo.Fetch())
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("succeeded");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("succeeded", ConsoleColor.Green);
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("failed");
-                Console.ForegroundColor = ConsoleColor.White;
+                PrintColored("failed", ConsoleColor.Red);
             }
 
             Console.WriteLine($" for {repo.Name}");
@@ -119,5 +103,12 @@ internal static class GitOperations
         Console.WriteLine("|");
 
         return 0;
+    }
+
+    static void PrintColored(string text, ConsoleColor color)
+    {
+        Console.ForegroundColor = color;
+        Console.WriteLine(text);
+        Console.ForegroundColor = ConsoleColor.White;
     }
 }
