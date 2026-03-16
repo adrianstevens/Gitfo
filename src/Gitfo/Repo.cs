@@ -67,11 +67,6 @@ internal class Repo
 
         try
         {
-            if (!Directory.Exists(Folder))
-            {
-                Directory.CreateDirectory(Folder);
-            }
-
             using var repo = new Repository(Folder);
 
             IsGitRepo = true;
@@ -117,10 +112,6 @@ internal class Repo
     public bool Pull()
     {
         using var repo = new Repository(Folder);
-
-        // Get the current branch
-        var branch = repo.Head;
-        var remote = repo.Network.Remotes["origin"];
 
         // Pull options including merge options
         var options = new LibGit2Sharp.PullOptions
@@ -187,7 +178,9 @@ internal class Repo
     {
         if (!Directory.Exists(Path.Combine(Folder, ".git")))
         {
-            return Clone();
+            var cloned = Clone();
+            if (cloned) Initialize();
+            return cloned;
         }
         else
         {
@@ -223,6 +216,11 @@ internal class Repo
         }
 
         // Clone the repository
+        if (!Directory.Exists(Folder))
+        {
+            Directory.CreateDirectory(Folder);
+        }
+
         try
         {
             Repository.Clone(repoUrl, Folder, options);
