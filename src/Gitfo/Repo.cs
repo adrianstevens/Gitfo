@@ -17,7 +17,8 @@ internal enum RepoStatus
     AuthenticationFailed,
     Conflict,
     MergeHeadNotFound,
-    NoRemote
+    NoRemote,
+    Error
 }
 
 internal class Repo
@@ -30,7 +31,7 @@ internal class Repo
 
     public bool IsGitRepo { get; protected set; } = false;
 
-    public string CurentBranch { get; set; }
+    public string CurrentBranch { get; set; }
 
     public bool IsPrivate { get; set; }
 
@@ -46,6 +47,8 @@ internal class Repo
 
     public RepoStatus Status { get; set; }
 
+    public string? ErrorMessage { get; private set; }
+
     public string Owner => _repoInfo.Owner;
     public string DefaultBranch => _repoInfo.DefaultBranch ?? "main";
 
@@ -58,7 +61,7 @@ internal class Repo
 
         Initialize();
 
-        CurentBranch ??= repoInfo.DefaultBranch ?? "[unknown]";
+        CurrentBranch ??= repoInfo.DefaultBranch ?? "[unknown]";
     }
 
     private void Initialize()
@@ -71,7 +74,7 @@ internal class Repo
 
             IsGitRepo = true;
 
-            CurentBranch = repo.Head.FriendlyName;
+            CurrentBranch = repo.Head.FriendlyName;
 
             HasRemote = repo.Head.IsTracking;
 
@@ -83,9 +86,10 @@ internal class Repo
         {
             Status = RepoStatus.DirectoryMissing;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Status = RepoStatus.DirectoryMissing;
+            Status = RepoStatus.Error;
+            ErrorMessage = ex.Message;
         }
     }
 
@@ -140,12 +144,9 @@ internal class Repo
         // Pull changes
         try
         {
-            Commands.Pull(
-                repo,
-                // TODO: put this in the .gitfo file
-                new Signature("gitfo", "gitfo@local", DateTimeOffset.Now), // Signature for merge commit if needed
-                options
-            );
+            var name = repo.Config.GetValueOrDefault("user.name", "gitfo");
+            var email = repo.Config.GetValueOrDefault("user.email", "gitfo@local");
+            Commands.Pull(repo, new Signature(name, email, DateTimeOffset.Now), options);
         }
         catch (CheckoutConflictException)
         {

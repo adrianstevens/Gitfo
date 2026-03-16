@@ -151,7 +151,7 @@ internal class GitfoConfiguration
         };
     }
 
-    internal static bool TryParse(string json, out GitfoConfiguration options)
+    internal static bool TryParse(string json, out GitfoConfiguration? options)
     {
         try
         {
@@ -160,19 +160,13 @@ internal class GitfoConfiguration
                 PropertyNameCaseInsensitive = true
             };
 
-            var opts = JsonSerializer.Deserialize<GitfoConfiguration>(json, jsonOpts);
-            if (opts != null)
-            {
-                options = opts;
-                return true;
-            }
+            options = JsonSerializer.Deserialize<GitfoConfiguration>(json, jsonOpts);
+            return options != null;
         }
         catch
         {
-            // NOP - will return default below
+            options = null;
+            return false;
         }
-
-        options = Default;
-        return false;
     }
 }

@@ -202,7 +202,7 @@ return result;
     var optionPath = Path.Combine(directory.FullName, GitfoConfiguration.ConfigFileName);
     if (File.Exists(optionPath))
     {
-        if (GitfoConfiguration.TryParse(File.ReadAllText(optionPath), out GitfoConfiguration options))
+        if (GitfoConfiguration.TryParse(File.ReadAllText(optionPath), out GitfoConfiguration? options) && options != null)
         {
             return (0, options);
         }
@@ -293,16 +293,19 @@ void ShowGitfoTable(IEnumerable<Repo> repos)
     Console.WriteLine($"| {"Repo name".PadRight(NameWidth)} | {"Current branch".PadRight(NameWidth)} | {"Ahead".PadRight(PropertyWidth)} | {"Behind".PadRight(PropertyWidth)} | {"Dirty".PadRight(PropertyWidth)} |");
     Console.WriteLine($"| {"".PadRight(NameWidth, '-')} | {"".PadRight(NameWidth, '-')} | {"".PadRight(PropertyWidth, '-')} | {"".PadRight(PropertyWidth, '-')} | {"".PadRight(PropertyWidth, '-')} |");
 
+    int count = 0;
     foreach (var repo in repos)
     {
+        count++;
         var name = repo.Name.PadRight(NameWidth);
 
         var friendly = repo.Status switch
         {
-            RepoStatus.Good => repo.CurentBranch,
+            RepoStatus.Good => repo.CurrentBranch,
             RepoStatus.DirectoryMissing => "[missing folder]",
             RepoStatus.AuthenticationFailed => "[authentication failed]",
             RepoStatus.NoRemote => "[no remote branch]",
+            RepoStatus.Error => $"[error: {repo.ErrorMessage}]",
             _ => repo.Status.ToString()
         };
 
@@ -327,7 +330,7 @@ void ShowGitfoTable(IEnumerable<Repo> repos)
         Console.WriteLine();
     }
 
-    if (repos.Count() == 0)
+    if (count == 0)
     {
         Console.WriteLine("| No git repos found");
     }
