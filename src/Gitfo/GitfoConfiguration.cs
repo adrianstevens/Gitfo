@@ -98,7 +98,7 @@ internal class GitfoConfiguration
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new JsonException();
 
-                string profileName = reader.GetString();
+                string profileName = reader.GetString() ?? throw new JsonException("Profile name cannot be null");
                 reader.Read();
 
                 var profileConfig = JsonSerializer.Deserialize<Profile>(ref reader, options);
@@ -129,10 +129,10 @@ internal class GitfoConfiguration
     public class RepositoryInfo
     {
         [JsonPropertyName("owner")]
-        public string Owner { get; set; }
+        public required string Owner { get; set; }
 
         [JsonPropertyName("repo")]
-        public string RepoName { get; set; }
+        public required string RepoName { get; set; }
 
         [JsonPropertyName("defaultBranch")]
         public string? DefaultBranch { get; set; }

@@ -42,7 +42,7 @@ internal class Repo
 
     public bool IsDirty { get; protected set; }
 
-    public RepoOptions Options { get; set; }
+    public RepoOptions? Options { get; set; }
 
     public RepoStatus Status { get; set; }
 

@@ -116,6 +116,14 @@ var result = Parser.Default.ParseArguments<
 
                     if (opts.SyncAll)
                     {
+                        if (options == null)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("| Error: No .gitfo config found — cannot sync all profiles.");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            return 1;
+                        }
+
                         int allReturn = 0;
 
                         foreach (var profile in options.Profiles)
@@ -127,11 +135,31 @@ var result = Parser.Default.ParseArguments<
                         return allReturn;
                     }
 
+                    if (repos == null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("| Error: No repositories loaded.");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return 1;
+                    }
+
                     return GitOperations.Sync(repos, opts);
                 },
-                (FetchOptions opts) => GitOperations.Fetch(repos, opts),
-                (PullOptions opts) => GitOperations.Pull(repos, opts),
-                (CheckoutOptions opts) => GitOperations.Checkout(repos, opts),
+                (FetchOptions opts) =>
+                {
+                    if (repos == null) return 1;
+                    return GitOperations.Fetch(repos, opts);
+                },
+                (PullOptions opts) =>
+                {
+                    if (repos == null) return 1;
+                    return GitOperations.Pull(repos, opts);
+                },
+                (CheckoutOptions opts) =>
+                {
+                    if (repos == null) return 1;
+                    return GitOperations.Checkout(repos, opts);
+                },
                 (GenerateOptions opts) =>
                 {
                     reload = true;
@@ -241,7 +269,7 @@ IEnumerable<Repo> LoadRepos(string rootPath, GitfoConfiguration.Profile profile)
                 generatedRepos.Add(new GitfoConfiguration.RepositoryInfo
                 {
                     LocalFolder = Path.GetFileName(owner),
-                    Owner = GitConfigParser.GetOwner(test),
+                    Owner = GitConfigParser.GetOwner(test) ?? Path.GetFileName(owner),
                     RepoName = Path.GetFileName(candidate),
                     DefaultBranch = "main",
                 });
