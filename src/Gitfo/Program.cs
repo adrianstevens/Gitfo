@@ -144,14 +144,17 @@ var result = Parser.Default.ParseArguments<
 
 Console.WriteLine("|");
 
-if (reload)
+if (reload && options != null)
 {
-    // TODO: find the one called "default" 
+    // TODO: find the one called "default"
     selectedProfile = options.Profiles.First();
     repos = LoadRepos(rootPath, selectedProfile);
 }
 
-ShowGitfoTable(repos);
+if (repos != null)
+{
+    ShowGitfoTable(repos);
+}
 
 return result;
 

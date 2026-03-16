@@ -216,10 +216,10 @@ internal class Repo
                 };
         }
 
-        // Set specific branch if provided
-        if (!string.IsNullOrEmpty(CurentBranch))
+        // Set specific branch if explicitly configured; let remote decide if not
+        if (!string.IsNullOrEmpty(_repoInfo.DefaultBranch))
         {
-            options.BranchName = CurentBranch;
+            options.BranchName = _repoInfo.DefaultBranch;
         }
 
         // Clone the repository
