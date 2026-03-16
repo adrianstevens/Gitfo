@@ -3,8 +3,8 @@
 internal static class FolderScanner
 {
     /// <summary>
-    /// Finds all subdirectories (one level deep) in <paramref name="rootPath"/>
-    /// that contain a .git folder, and creates Repo objects for them.
+    /// Finds git repositories up to two levels deep in <paramref name="rootPath"/>,
+    /// matching both root/repo and root/owner/repo structures.
     /// </summary>
     public static IEnumerable<Repo> FindLocalRepos(string rootPath)
     {
@@ -12,27 +12,38 @@ internal static class FolderScanner
         if (!Directory.Exists(rootPath))
             return results;
 
-        // Look one level deep from rootPath
-        string[] subDirs = Directory.GetDirectories(rootPath);
-        foreach (var subDir in subDirs)
+        foreach (var subDir in Directory.GetDirectories(rootPath))
         {
-            string gitDir = Path.Combine(subDir, ".git");
-            if (Directory.Exists(gitDir))
+            if (Directory.Exists(Path.Combine(subDir, ".git")))
             {
-                // Use a "dummy" RepositoryInfo so we can instantiate a Repo class
-                var dummyInfo = new GitfoConfiguration.RepositoryInfo
+                // root/repo layout
+                results.Add(MakeRepo("(local)", subDir));
+            }
+            else
+            {
+                // root/owner/repo layout — check one level deeper
+                foreach (var repoDir in Directory.GetDirectories(subDir))
                 {
-                    Owner = "(local)",
-                    RepoName = Path.GetFileName(subDir),
-                    DefaultBranch = "main",
-                    AuthToken = null
-                };
-
-                var repo = new Repo(subDir, dummyInfo);
-                results.Add(repo);
+                    if (Directory.Exists(Path.Combine(repoDir, ".git")))
+                    {
+                        results.Add(MakeRepo(Path.GetFileName(subDir), repoDir));
+                    }
+                }
             }
         }
 
         return results;
+    }
+
+    private static Repo MakeRepo(string owner, string repoDir)
+    {
+        var info = new GitfoConfiguration.RepositoryInfo
+        {
+            Owner = owner,
+            RepoName = Path.GetFileName(repoDir),
+            DefaultBranch = "main",
+            AuthToken = null
+        };
+        return new Repo(repoDir, info);
     }
 }
